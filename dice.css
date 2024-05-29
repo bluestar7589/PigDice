@@ -12,7 +12,7 @@ h1 {
     margin-bottom: .25em;
 }
 label {
-    width: 4em;
+    width: 8em;
     text-align: right;
     padding-bottom: .5em;
 }
@@ -43,4 +43,8 @@ fieldset {
 }
 #hold {
     margin-right: 2em;
+}
+
+#winner {
+    visibility: hidden;
 }
