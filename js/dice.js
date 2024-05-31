@@ -3,6 +3,12 @@ let newTaskModal = new bootstrap.Modal(element);
 function $(id) {
     return document.getElementById(id);
 }
+window.onload = function () {
+    let newGameBtn = document.getElementById("new_game");
+    newGameBtn.onclick = createNewGame;
+    document.getElementById("roll").onclick = rollDie;
+    document.getElementById("hold").onclick = holdDie;
+};
 function generateRandomValue(minValue, maxValue) {
     var random = Math.floor(Math.random() * (maxValue - minValue + 1)) + minValue;
     return random;
@@ -19,12 +25,6 @@ function changePlayers() {
     }
     document.getElementById("current").innerText = currentPlayerName;
 }
-window.onload = function () {
-    let newGameBtn = document.getElementById("new_game");
-    newGameBtn.onclick = createNewGame;
-    document.getElementById("roll").onclick = rollDie;
-    document.getElementById("hold").onclick = holdDie;
-};
 function createNewGame() {
     resetForm();
     if (!isPresent()) {
@@ -42,17 +42,42 @@ function createNewGame() {
     document.getElementById("player2").setAttribute("disabled", "disabled");
 }
 function rollDie() {
-    let currTotal = parseInt(document.getElementById("total").value);
+    let currTotal = getCurrentTotal();
+    let dieImg = getDieImageElement();
     let rollNumber = generateRandomValue(1, 6);
-    document.getElementById("die").value = rollNumber.toString();
+    let sound = document.getElementById('diceSound');
+    sound.play();
+    updateDieImage(dieImg, rollNumber);
+    updateDieValue(rollNumber);
     if (rollNumber == 1) {
         changePlayers();
         currTotal = 0;
     }
     else {
-        currTotal += rollNumber;
+        currTotal = handleRollGreaterThanOne(currTotal, rollNumber);
     }
+    updateTotalValue(currTotal);
+    checkForWinner(currTotal);
+}
+function getCurrentTotal() {
+    return parseInt(document.getElementById("total").value);
+}
+function getDieImageElement() {
+    return document.getElementById("diceIMG");
+}
+function updateDieImage(dieImg, rollNumber) {
+    dieImg.src = "../pics/dice-" + rollNumber + ".png";
+}
+function updateDieValue(rollNumber) {
+    document.getElementById("die").value = rollNumber.toString();
+}
+function handleRollGreaterThanOne(currTotal, rollNumber) {
+    return currTotal += rollNumber;
+}
+function updateTotalValue(currTotal) {
     document.getElementById("total").value = currTotal.toString();
+}
+function checkForWinner(currTotal) {
     let currentPlayerName = document.getElementById("current").innerText;
     let player1Name = document.getElementById("player1").value;
     let finalScore = 0;
@@ -63,20 +88,22 @@ function rollDie() {
         finalScore = parseInt(document.getElementById("score2").value) + currTotal;
     }
     if (finalScore >= 100) {
-        let currentPlayerName = document.getElementById("current").innerText;
-        let player1Name = document.getElementById("player1").value;
-        let player2Name = document.getElementById("player2").value;
-        let winner = "";
-        if (currentPlayerName == player1Name) {
-            winner = player1Name + " is the winner";
-        }
-        else {
-            winner = player2Name + " is the winner";
-        }
-        document.getElementById("winner").innerText = winner;
-        document.getElementById("winner").style.visibility = "visible";
-        newTaskModal.hide();
+        announceWinner(currentPlayerName, player1Name);
     }
+}
+function announceWinner(currentPlayerName, player1Name) {
+    let player2Name = document.getElementById("player2").value;
+    let winner = "";
+    if (currentPlayerName == player1Name) {
+        winner = player1Name + " is the winner";
+    }
+    else {
+        winner = player2Name + " is the winner";
+    }
+    document.getElementById("winner").innerText = winner;
+    document.getElementById("winner").style.color = "red";
+    document.getElementById("winner").style.visibility = "visible";
+    newTaskModal.hide();
 }
 function holdDie() {
     let currentPlayerName = document.getElementById("current").innerText;
@@ -98,6 +125,8 @@ function holdDie() {
     changePlayers();
 }
 function resetForm() {
+    let dieImg = document.getElementById("diceIMG");
+    dieImg.src = "";
     $("score1").value = "";
     $("score2").value = "";
     $("die").value = "";
