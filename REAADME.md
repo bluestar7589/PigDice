@@ -4,7 +4,7 @@ For this assignment we will create a functional Pig Dice application. An example
 
 ## Live website
 
-Check out the live website hosted by [GitHub Pages]()
+Check out the live website hosted by [GitHub Pages](https://bluestar7589.github.io/PigDice/)
 
 ## Guide how to setup for initial project
 
