@@ -64,13 +64,10 @@ function rollDie() {
         game.currTotal = 0;
     }
     else {
-        game.currTotal = handleRollGreaterThanOne(game.currTotal, rollNumber);
+        game.currTotal = handleRollGreaterThanOne(rollNumber);
     }
-    updateTotalValue(game.currTotal);
-    checkForWinner(game.currTotal);
-}
-function getCurrentTotal() {
-    return parseInt($("total").value);
+    updateTotalValue();
+    checkForWinner();
 }
 function getDieImageElement() {
     return $("diceIMG");
@@ -81,13 +78,13 @@ function updateDieImage(dieImg, rollNumber) {
 function updateDieValue(rollNumber) {
     $("die").value = rollNumber.toString();
 }
-function handleRollGreaterThanOne(currTotal, rollNumber) {
+function handleRollGreaterThanOne(rollNumber) {
     return game.currTotal += rollNumber;
 }
-function updateTotalValue(currTotal) {
+function updateTotalValue() {
     $("total").value = game.currTotal.toString();
 }
-function checkForWinner(currTotal) {
+function checkForWinner() {
     let finalScore = 0;
     if (game.whoseTurn == p1.name) {
         finalScore = p1.totalScore + game.currTotal;
@@ -96,12 +93,12 @@ function checkForWinner(currTotal) {
         finalScore = p2.totalScore + game.currTotal;
     }
     if (finalScore >= 20) {
-        announceWinner(game.whoseTurn, p1.name);
+        announceWinner();
     }
 }
-function announceWinner(currentPlayerName, player1Name) {
+function announceWinner() {
     let winner = "";
-    if (currentPlayerName == p1.name) {
+    if (game.whoseTurn == p1.name) {
         winner = p1.name;
     }
     else {

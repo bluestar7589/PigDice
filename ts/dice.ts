@@ -110,8 +110,6 @@ function changePlayers():void{
  * Main function for roll a dice
  */
 function rollDie(): void {
-    // Get the current total from the form
-    //let currTotal = getCurrentTotal();
 
     // Get the image element for the die
     let dieImg = getDieImageElement();
@@ -135,25 +133,15 @@ function rollDie(): void {
         game.currTotal = 0;
     } else {
         // If the roll is greater than 1, add roll value to current total
-        game.currTotal = handleRollGreaterThanOne(game.currTotal, rollNumber);
+        game.currTotal = handleRollGreaterThanOne(rollNumber);
     }
 
     // Update the total value in the form
-    updateTotalValue(game.currTotal);
+    updateTotalValue();
 
     // Check if total is greater or equal to 100, if so, announce the winner and stop the game
-    checkForWinner(game.currTotal);
+    checkForWinner();
 }
-
-
-/**
- * Function to get the current total from the form
- * @returns the currently total for that turn
- */
-function getCurrentTotal(): number {
-    return parseInt((<HTMLInputElement>$("total")).value);
-}
-
 
 /**
  * Function to get the image element for the die
@@ -185,11 +173,10 @@ function updateDieValue(rollNumber: number): void {
 
 /**
  * Function to handle the case when the roll is greater than 1
- * @param currTotal the currently total for that turn
- * @param rollNumber the number that rolled out
+  * @param rollNumber the number that rolled out
  * @returns return the total after roll is greater than 1
  */
-function handleRollGreaterThanOne(currTotal: number, rollNumber: number): number {
+function handleRollGreaterThanOne(rollNumber: number): number {
     return game.currTotal += rollNumber;
 }
 
@@ -198,7 +185,7 @@ function handleRollGreaterThanOne(currTotal: number, rollNumber: number): number
  * Function to update the total value in the form
  * @param currTotal the currently total for that turn
  */
-function updateTotalValue(currTotal: number): void {
+function updateTotalValue(): void {
     (<HTMLInputElement>$("total")).value = game.currTotal.toString();
 }
 
@@ -207,7 +194,7 @@ function updateTotalValue(currTotal: number): void {
  * Function to check if total is greater or equal to 100, if so, announce the winner and stop the game
  * @param currTotal the currently total in that turn
  */
-function checkForWinner(currTotal: number): void {
+function checkForWinner(): void {
     //let currentPlayerName = (<HTMLElement>$("current")).innerText;
     let finalScore = 0;
 
@@ -220,7 +207,7 @@ function checkForWinner(currTotal: number): void {
 
     // If total score is greater or equal to 100, announce the winner
     if (finalScore >= 20) {
-        announceWinner(game.whoseTurn, p1.name);
+        announceWinner();
     }
 }
 
@@ -230,11 +217,11 @@ function checkForWinner(currTotal: number): void {
  * @param currentPlayerName name of the current player
  * @param player1Name name of player 1
  */
-function announceWinner(currentPlayerName: string, player1Name: string): void {
+function announceWinner(): void {
     let winner = "";
 
     // Determine the winner based on the current player
-    if (currentPlayerName == p1.name) {
+    if (game.whoseTurn == p1.name) {
         winner = p1.name;
     } else {
         winner = p2.name;
@@ -259,13 +246,9 @@ function holdDie():void{
     //determine who the current player is
     //add the current turn total to the player's total score
     if(game.whoseTurn == p1.name) {
-        //p1.totalScore = parseInt((<HTMLInputElement>$("score1")).value);
-        //game.currTotal = parseInt((<HTMLInputElement>$("total")).value);
         p1.totalScore += game.currTotal;
         (<HTMLInputElement>$("score1")).value = p1.totalScore.toString();
     } else {
-        //p2.totalScore = parseInt((<HTMLInputElement>$("score2")).value);
-        //let total = parseInt((<HTMLInputElement>$("total")).value);
         p2.totalScore += game.currTotal;
         (<HTMLInputElement>$("score2")).value = p2.totalScore.toString();
     }
