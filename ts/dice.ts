@@ -1,12 +1,30 @@
 // Because I you're using Bootstrap from a CDN in your HTML file, 
 // I don't need to import it in your TypeScript file. Instead, I can use the bootstrap object directly in your TypeScript file.
 declare var bootstrap: any;
+/**
+ * Object to keep information for player
+ */
+class Player {
+    name: string;
+    totalScore: number;
+}
 
-// https://soundbible.com/182-Shake-And-Roll-Dice.html
+/**
+ * Object to keep information for the game
+ */
+class Game {
+    whoseTurn: string;
+    stateOfGame: string;
+    currTotal: number;
+}
 
 // declare the form for playing game
-let element = document.getElementById('newTaskModal') as HTMLElement;
+let element = $('newTaskModal') as HTMLElement;
 let newTaskModal = new bootstrap.Modal(element);
+
+let p1:Player = new Player();
+let p2:Player = new Player();
+let game:Game = new Game();
 
 /**
  * This function return the element by ID 
@@ -16,12 +34,48 @@ function $(id:string): HTMLElement {
 }
 
 window.onload = function(){
-    let newGameBtn = document.getElementById("new_game") as HTMLButtonElement;
+    let newGameBtn = $("new_game") as HTMLButtonElement;
     newGameBtn.onclick = createNewGame;
+    // add the event for button roll and hold
+    (<HTMLButtonElement>$("roll")).onclick = rollDie;
+    (<HTMLButtonElement>$("hold")).onclick = holdDie;
+}
 
-    (<HTMLButtonElement>document.getElementById("roll")).onclick = rollDie;
+/**
+ * To create a new game
+ */
+function createNewGame():void{
+    //set player 1 and player 2 scores to 0
+    resetForm();
+    //verify each player has a name
+    //if both players don't have a name display error
+    if(!isPresent()){
+        alert("Please enter a name for both players");
+        return;
+    }
+    (<HTMLElement>$("current")).innerText = (<HTMLInputElement>$("player1")).value;
+    (<HTMLElement>$("lblPlayer1")).textContent = (<HTMLInputElement>$("player1")).value + "'s score";
+    (<HTMLElement>$("lblPlayer2")).textContent = (<HTMLInputElement>$("player2")).value + "'s score";
+    // open the form to start play the game
+    
+    newTaskModal.show();
+    //if both players do have a name start the game!
+    (<HTMLInputElement>$("total")).value = "0";
+    (<HTMLInputElement>$("score1")).value = "0";
+    (<HTMLInputElement>$("score2")).value = "0";
+    //lock in player names and then change players
+    (<HTMLInputElement>$("player1")).setAttribute("disabled", "disabled");
+    (<HTMLInputElement>$("player2")).setAttribute("disabled", "disabled");
 
-    (<HTMLButtonElement>document.getElementById("hold")).onclick = holdDie;
+    // add player1 and player2 to object player
+    p1.name = (<HTMLInputElement>$("player1")).value;
+    p1.totalScore = parseInt((<HTMLInputElement>$("score1")).value);
+    p2.name = (<HTMLInputElement>$("player2")).value;
+    p2.totalScore = parseInt((<HTMLInputElement>$("score2")).value);
+
+    game.whoseTurn = p1.name;
+    game.currTotal = parseInt((<HTMLInputElement>$("total")).value);
+    game.stateOfGame = "Playing...";
 }
 
 /**
@@ -41,46 +95,15 @@ function generateRandomValue(minValue:number, maxValue:number):number{
  * To change to next player when needed
  */
 function changePlayers():void{
-    let currentPlayerName = (<HTMLElement>document.getElementById("current")).innerText;
-    let player1Name = (<HTMLInputElement>document.getElementById("player1")).value;
-    let player2Name = (<HTMLInputElement>document.getElementById("player2")).value;
-
     
     //swap from player to player by comparing current name to player names
     //set currentPlayerName to the next player
-    if (currentPlayerName == player1Name) {
-        currentPlayerName = player2Name;
+    if (game.whoseTurn == p1.name) {
+        game.whoseTurn = p2.name;
     } else {
-        currentPlayerName = player1Name;
+        game.whoseTurn = p1.name;
     }
-    (<HTMLElement>document.getElementById("current")).innerText = currentPlayerName;
-}
-
-/**
- * To create a new game
- */
-function createNewGame():void{
-    //set player 1 and player 2 scores to 0
-    resetForm();
-    //verify each player has a name
-    //if both players don't have a name display error
-    if(!isPresent()){
-        alert("Please enter a name for both players");
-        return;
-    }
-    (<HTMLElement>document.getElementById("current")).innerText = (<HTMLInputElement>document.getElementById("player1")).value;
-    (<HTMLElement>document.getElementById("lblPlayer1")).textContent = (<HTMLInputElement>document.getElementById("player1")).value + "'s score";
-    (<HTMLElement>document.getElementById("lblPlayer2")).textContent = (<HTMLInputElement>document.getElementById("player2")).value + "'s score";
-    // open the form to start play the game
-    
-    newTaskModal.show();
-    //if both players do have a name start the game!
-    (<HTMLInputElement>document.getElementById("total")).value = "0";
-    (<HTMLInputElement>document.getElementById("score1")).value = "0";
-    (<HTMLInputElement>document.getElementById("score2")).value = "0";
-    //lock in player names and then change players
-    (<HTMLInputElement>document.getElementById("player1")).setAttribute("disabled", "disabled");
-    (<HTMLInputElement>document.getElementById("player2")).setAttribute("disabled", "disabled");
+    (<HTMLElement>$("current")).innerText = game.whoseTurn;
 }
 
 /**
@@ -88,7 +111,7 @@ function createNewGame():void{
  */
 function rollDie(): void {
     // Get the current total from the form
-    let currTotal = getCurrentTotal();
+    //let currTotal = getCurrentTotal();
 
     // Get the image element for the die
     let dieImg = getDieImageElement();
@@ -97,7 +120,7 @@ function rollDie(): void {
     let rollNumber = generateRandomValue(1, 6);
 
     // Add sound
-    let sound = document.getElementById('diceSound') as HTMLAudioElement;
+    let sound = $('diceSound') as HTMLAudioElement;
     sound.play();
 
     // Update the image of the die based on the roll number
@@ -109,17 +132,17 @@ function rollDie(): void {
     // If the roll is 1, change players and set current total to 0
     if (rollNumber == 1) {
         changePlayers();
-        currTotal = 0;
+        game.currTotal = 0;
     } else {
         // If the roll is greater than 1, add roll value to current total
-        currTotal = handleRollGreaterThanOne(currTotal, rollNumber);
+        game.currTotal = handleRollGreaterThanOne(game.currTotal, rollNumber);
     }
 
     // Update the total value in the form
-    updateTotalValue(currTotal);
+    updateTotalValue(game.currTotal);
 
     // Check if total is greater or equal to 100, if so, announce the winner and stop the game
-    checkForWinner(currTotal);
+    checkForWinner(game.currTotal);
 }
 
 
@@ -128,7 +151,7 @@ function rollDie(): void {
  * @returns the currently total for that turn
  */
 function getCurrentTotal(): number {
-    return parseInt((<HTMLInputElement>document.getElementById("total")).value);
+    return parseInt((<HTMLInputElement>$("total")).value);
 }
 
 
@@ -137,7 +160,7 @@ function getCurrentTotal(): number {
  * @returns the image tag by ID
  */
 function getDieImageElement(): HTMLImageElement {
-    return (<HTMLImageElement>document.getElementById("diceIMG"));
+    return (<HTMLImageElement>$("diceIMG"));
 }
 
 
@@ -156,7 +179,7 @@ function updateDieImage(dieImg: HTMLImageElement, rollNumber: number): void {
  * @param rollNumber the number that rolled out
  */
 function updateDieValue(rollNumber: number): void {
-    (<HTMLInputElement>document.getElementById("die")).value = rollNumber.toString();
+    (<HTMLInputElement>$("die")).value = rollNumber.toString();
 }
 
 
@@ -167,7 +190,7 @@ function updateDieValue(rollNumber: number): void {
  * @returns return the total after roll is greater than 1
  */
 function handleRollGreaterThanOne(currTotal: number, rollNumber: number): number {
-    return currTotal += rollNumber;
+    return game.currTotal += rollNumber;
 }
 
 
@@ -176,7 +199,7 @@ function handleRollGreaterThanOne(currTotal: number, rollNumber: number): number
  * @param currTotal the currently total for that turn
  */
 function updateTotalValue(currTotal: number): void {
-    (<HTMLInputElement>document.getElementById("total")).value = currTotal.toString();
+    (<HTMLInputElement>$("total")).value = game.currTotal.toString();
 }
 
 
@@ -185,20 +208,19 @@ function updateTotalValue(currTotal: number): void {
  * @param currTotal the currently total in that turn
  */
 function checkForWinner(currTotal: number): void {
-    let currentPlayerName = (<HTMLElement>document.getElementById("current")).innerText;
-    let player1Name = (<HTMLInputElement>document.getElementById("player1")).value;
+    //let currentPlayerName = (<HTMLElement>$("current")).innerText;
     let finalScore = 0;
 
     // Check who is the current player to get the total score
-    if (currentPlayerName == player1Name) {
-        finalScore = parseInt((<HTMLInputElement>document.getElementById("score1")).value) + currTotal;
+    if (game.whoseTurn == p1.name) {
+        finalScore = p1.totalScore + game.currTotal;
     } else {
-        finalScore = parseInt((<HTMLInputElement>document.getElementById("score2")).value) + currTotal;
+        finalScore = p2.totalScore + game.currTotal;
     }
 
     // If total score is greater or equal to 100, announce the winner
-    if (finalScore >= 100) {
-        announceWinner(currentPlayerName, player1Name);
+    if (finalScore >= 20) {
+        announceWinner(game.whoseTurn, p1.name);
     }
 }
 
@@ -209,20 +231,21 @@ function checkForWinner(currTotal: number): void {
  * @param player1Name name of player 1
  */
 function announceWinner(currentPlayerName: string, player1Name: string): void {
-    let player2Name = (<HTMLInputElement>document.getElementById("player2")).value;
     let winner = "";
 
     // Determine the winner based on the current player
-    if (currentPlayerName == player1Name) {
-        winner = player1Name + " is the winner";
+    if (currentPlayerName == p1.name) {
+        winner = p1.name;
     } else {
-        winner = player2Name + " is the winner";
+        winner = p2.name;
     }
 
+    game.stateOfGame = winner + " is the winner";
     // Display the winner and make the winner element visible
-    document.getElementById("winner").innerText = winner;
-    document.getElementById("winner").style.color = "red";
-    (<HTMLElement>document.getElementById("winner")).style.visibility = "visible";
+    $("winner").innerText = game.stateOfGame;
+    $("winner").style.color = "red";
+    (<HTMLElement>$("winner")).style.visibility = "visible";
+    
 
     // Close the form if needed
     newTaskModal.hide();
@@ -232,27 +255,25 @@ function announceWinner(currentPlayerName: string, player1Name: string): void {
  * To hold the currently total and change to other player
  */
 function holdDie():void{
-    //get the current turn total
-    let currentPlayerName = (<HTMLElement>document.getElementById("current")).innerText;
-    let player1Name = (<HTMLInputElement>document.getElementById("player1")).value;
-    //let player2Name = (<HTMLInputElement>document.getElementById("player2")).value;
+    
     //determine who the current player is
     //add the current turn total to the player's total score
-    if(currentPlayerName == player1Name) {
-        let score1 = parseInt((<HTMLInputElement>document.getElementById("score1")).value);
-        let total = parseInt((<HTMLInputElement>document.getElementById("total")).value);
-        score1 += total;
-        (<HTMLInputElement>document.getElementById("score1")).value = score1.toString();
+    if(game.whoseTurn == p1.name) {
+        //p1.totalScore = parseInt((<HTMLInputElement>$("score1")).value);
+        //game.currTotal = parseInt((<HTMLInputElement>$("total")).value);
+        p1.totalScore += game.currTotal;
+        (<HTMLInputElement>$("score1")).value = p1.totalScore.toString();
     } else {
-        let score2 = parseInt((<HTMLInputElement>document.getElementById("score2")).value);
-        let total = parseInt((<HTMLInputElement>document.getElementById("total")).value);
-        score2 += total;
-        (<HTMLInputElement>document.getElementById("score2")).value = score2.toString();
+        //p2.totalScore = parseInt((<HTMLInputElement>$("score2")).value);
+        //let total = parseInt((<HTMLInputElement>$("total")).value);
+        p2.totalScore += game.currTotal;
+        (<HTMLInputElement>$("score2")).value = p2.totalScore.toString();
     }
 
     //reset the turn total to 0
-    (<HTMLInputElement>document.getElementById("total")).value = "0";
-    (<HTMLInputElement>document.getElementById("die")).value = "0";
+    (<HTMLInputElement>$("total")).value = "0";    
+    (<HTMLInputElement>$("die")).value = "0";
+    game.currTotal = 0;
     //change players
     changePlayers();
 }
@@ -260,7 +281,7 @@ function holdDie():void{
  * This function to reset the value of the form
  */
 function resetForm():void {
-    let dieImg = (<HTMLImageElement>document.getElementById("diceIMG"));
+    let dieImg = (<HTMLImageElement>$("diceIMG"));
     dieImg.src = "";
     ($("score1") as HTMLInputElement).value = "";
     ($("score2") as HTMLInputElement).value = "";
