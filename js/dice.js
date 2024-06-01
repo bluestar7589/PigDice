@@ -54,18 +54,21 @@ function changePlayers() {
 }
 function rollDie() {
     let dieImg = getDieImageElement();
-    let rollNumber = generateRandomValue(1, 6);
+    dieImg.src = "pics/dice.gif";
     let sound = $('diceSound');
     sound.play();
-    updateDieImage(dieImg, rollNumber);
-    updateDieValue(rollNumber);
-    if (rollNumber == 1) {
-        changePlayers();
-        game.currTotal = 0;
-    }
-    else {
-        game.currTotal = handleRollGreaterThanOne(rollNumber);
-    }
+    setTimeout(() => {
+        let rollNumber = generateRandomValue(1, 6);
+        updateDieImage(dieImg, rollNumber);
+        updateDieValue(rollNumber);
+        if (rollNumber == 1) {
+            changePlayers();
+            game.currTotal = 0;
+        }
+        else {
+            game.currTotal = handleRollGreaterThanOne(rollNumber);
+        }
+    }, 1500);
     updateTotalValue();
     checkForWinner();
 }

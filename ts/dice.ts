@@ -114,27 +114,33 @@ function rollDie(): void {
     // Get the image element for the die
     let dieImg = getDieImageElement();
 
-    // Roll the die and get a random value 1 - 6
-    let rollNumber = generateRandomValue(1, 6);
+    // Display the dice GIF
+    dieImg.src = "pics/dice.gif";
 
     // Add sound
     let sound = $('diceSound') as HTMLAudioElement;
     sound.play();
 
-    // Update the image of the die based on the roll number
-    updateDieImage(dieImg, rollNumber);
+    // Set a delay before rolling the die
+    setTimeout(() => {
+        // Roll the die and get a random value 1 - 6
+        let rollNumber = generateRandomValue(1, 6);
 
-    // Update the value of the die in the form
-    updateDieValue(rollNumber);
+        // Update the image of the die based on the roll number
+        updateDieImage(dieImg, rollNumber);
 
-    // If the roll is 1, change players and set current total to 0
-    if (rollNumber == 1) {
-        changePlayers();
-        game.currTotal = 0;
-    } else {
-        // If the roll is greater than 1, add roll value to current total
-        game.currTotal = handleRollGreaterThanOne(rollNumber);
-    }
+        // Update the value of the die in the form
+        updateDieValue(rollNumber);
+
+        // If the roll is 1, change players and set current total to 0
+        if (rollNumber == 1) {
+            changePlayers();
+            game.currTotal = 0;
+        } else {
+            // If the roll is greater than 1, add roll value to current total
+            game.currTotal = handleRollGreaterThanOne(rollNumber);
+        }
+    }, 1500); // 1500 milliseconds = 5 seconds
 
     // Update the total value in the form
     updateTotalValue();
