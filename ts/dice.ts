@@ -206,7 +206,7 @@ function checkForWinner(): void {
     }
 
     // If total score is greater or equal to 100, announce the winner
-    if (finalScore >= 20) {
+    if (finalScore >= 100) {
         announceWinner();
     }
 }

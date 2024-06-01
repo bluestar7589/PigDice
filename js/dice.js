@@ -92,7 +92,7 @@ function checkForWinner() {
     else {
         finalScore = p2.totalScore + game.currTotal;
     }
-    if (finalScore >= 20) {
+    if (finalScore >= 100) {
         announceWinner();
     }
 }
