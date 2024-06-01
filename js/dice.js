@@ -68,9 +68,9 @@ function rollDie() {
         else {
             game.currTotal = handleRollGreaterThanOne(rollNumber);
         }
+        updateTotalValue();
+        checkForWinner();
     }, 1500);
-    updateTotalValue();
-    checkForWinner();
 }
 function getDieImageElement() {
     return $("diceIMG");

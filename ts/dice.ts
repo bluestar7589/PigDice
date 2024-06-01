@@ -140,13 +140,15 @@ function rollDie(): void {
             // If the roll is greater than 1, add roll value to current total
             game.currTotal = handleRollGreaterThanOne(rollNumber);
         }
+
+        // Update the total value in the form
+        updateTotalValue();
+
+        // Check if total is greater or equal to 100, if so, announce the winner and stop the game
+        checkForWinner();
     }, 1500); // 1500 milliseconds = 5 seconds
 
-    // Update the total value in the form
-    updateTotalValue();
 
-    // Check if total is greater or equal to 100, if so, announce the winner and stop the game
-    checkForWinner();
 }
 
 /**
