@@ -158,7 +158,7 @@ function getDieImageElement(): HTMLImageElement {
  * @param rollNumber the number that rolled out
  */
 function updateDieImage(dieImg: HTMLImageElement, rollNumber: number): void {
-    dieImg.src = "../pics/dice-" + rollNumber + ".png";
+    dieImg.src = "pics/dice-" + rollNumber + ".png";
 }
 
 

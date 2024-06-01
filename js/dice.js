@@ -73,7 +73,7 @@ function getDieImageElement() {
     return $("diceIMG");
 }
 function updateDieImage(dieImg, rollNumber) {
-    dieImg.src = "../pics/dice-" + rollNumber + ".png";
+    dieImg.src = "pics/dice-" + rollNumber + ".png";
 }
 function updateDieValue(rollNumber) {
     $("die").value = rollNumber.toString();
